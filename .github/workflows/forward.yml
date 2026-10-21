@@ -68,5 +68,6 @@ jobs:
       - name: Reply on the issue
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: gh issue comment "$ISSUE_NUMBER" --body-file /tmp/reply.md
