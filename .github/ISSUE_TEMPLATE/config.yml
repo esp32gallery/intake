@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report
+    url: https://github.com/esp32gallery/intake/security/advisories/new
+    about: Report vulnerabilities privately. Do not open a public security issue.
+  - name: Copyright and media removal
+    url: https://github.com/esp32gallery/intake/issues/new?template=copyright.yml
+    about: Identify a page and original work. Do not post identity documents or sensitive evidence publicly.
+  - name: Submit through the website
+    url: https://esp32gallery.com/
+    about: The site form uses the same review queue.

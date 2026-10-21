@@ -1,0 +1,34 @@
+name: Submit an ESP32 project
+description: Paste a public GitHub repository URL to start the review queue.
+title: "[Submission] "
+labels: [submission]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Paste the project's public GitHub repository URL. Opening this issue puts it in the same review queue as the form on esp32gallery.com. The review checks repository access, duplicate entries, license metadata and basic project details. Public visibility supports a metadata listing; it does not grant permission to copy project code or media. This does not run firmware or certify board compatibility. A maintainer reviews rights and any preview separately.
+  - type: input
+    id: repository
+    attributes:
+      label: GitHub repository URL
+      description: One repository link, such as https://github.com/owner/project
+      placeholder: https://github.com/owner/project
+    validations:
+      required: true
+  - type: textarea
+    id: media_rights
+    attributes:
+      label: Media source and rights
+      description: List screenshots or images and their original source, creator, license, or permission. Repository license metadata alone may not cover external media.
+      placeholder: "Source URL; creator; license or permission"
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: This is a public repository and the linked project is relevant to ESP32 hardware.
+          required: true
+        - label: I understand that submission review does not prove browser execution, board compatibility, or physical safety.
+          required: true

@@ -1,0 +1,72 @@
+name: Forward submission to review queue
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: forward-${{ github.event.issue.number }}
+  cancel-in-progress: false
+jobs:
+  forward:
+    if: contains(github.event.issue.labels.*.name, 'submission')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Queue the repository the issue names
+        id: queue
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, urllib.request, urllib.error
+          from pathlib import Path
+
+          body = os.environ.get("ISSUE_BODY") or ""
+          match = re.search(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?", body)
+          if not match:
+              Path("/tmp/reply.md").write_text(
+                  "No GitHub repository URL was found in this issue. "
+                  "Edit the issue to include one, such as https://github.com/owner/project."
+              )
+              raise SystemExit(0)
+
+          repository = match.group(0).rstrip("/")
+          payload = json.dumps({"repository": repository}).encode()
+          request = urllib.request.Request(
+              "https://esp32gallery.com/api/submissions",
+              data=payload,
+              headers={
+                  "Content-Type": "application/json",
+                  # The queue endpoint accepts browser submissions from the site origin.
+                  "Origin": "https://esp32gallery.com",
+                  "User-Agent": "esp32gallery-intake",
+              },
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  data = json.loads(response.read())
+          except urllib.error.HTTPError as error:
+              reason = error.read().decode("utf-8", "replace")[:200]
+              Path("/tmp/reply.md").write_text(
+                  f"Could not queue {repository}: {error.code} {reason}. "
+                  "A maintainer will pick this up manually."
+              )
+              raise SystemExit(0)
+
+          status_url = "https://esp32gallery.com" + data.get("status_url", "/")
+          Path("/tmp/reply.md").write_text(
+              f"Queued {repository} for review.\n\n"
+              f"- Submission ID: `{data.get('id', 'unknown')}`\n"
+              f"- State: `{data.get('state', 'received')}`\n"
+              f"- Status page: {status_url}\n\n"
+              f"Review normally finishes in {data.get('review_days', '1-3')} days. "
+              "This is the same queue the website form uses."
+          )
+          PY
+      - name: Reply on the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue comment "$ISSUE_NUMBER" --body-file /tmp/reply.md

@@ -1,0 +1,58 @@
+name: Copyright or media removal request
+description: Identify material that needs attribution, correction, or review for removal.
+title: "[Copyright review] "
+labels: [copyright]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue is public. Do not post government identity documents, private
+        addresses, contracts, credentials, or sensitive evidence. Identify the
+        precise page and original work first. A maintainer may move follow-up
+        to a private channel where possible.
+
+        Urgent security vulnerabilities should use private vulnerability
+        reporting instead.
+  - type: input
+    id: gallery_url
+    attributes:
+      label: ESP32 Gallery page URL
+      description: The exact affected project, board, or policy page.
+      placeholder: https://esp32gallery.com/projects/example/
+    validations:
+      required: true
+  - type: input
+    id: original_work
+    attributes:
+      label: Original work or source
+      description: Link or identify the original work and its owner.
+    validations:
+      required: true
+  - type: dropdown
+    id: request_type
+    attributes:
+      label: Request
+      options:
+        - Attribution correction
+        - Source correction
+        - Permission information
+        - Removal request
+        - Other rights concern
+    validations:
+      required: true
+  - type: textarea
+    id: explanation
+    attributes:
+      label: Explanation
+      description: Explain why the current use needs correction or removal, without posting sensitive evidence.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I understand this issue is public and have not included sensitive personal information.
+          required: true
+        - label: I will provide sensitive evidence privately if maintainers request it.
+          required: false
